@@ -65,9 +65,39 @@
             iframe.contentWindow.postMessage(event.data, "*");
           }
         });
+
+        // This code loads the IFrame Player API code asynchronously.
+        var tag = document.createElement("script");
+        tag.src = "https://www.youtube.com/iframe_api";
+        var firstScriptTag = document.getElementsByTagName("script")[0];
+        firstScriptTag.parentNode.insertBefore(tag, firstScriptTag);
+
+        let player;
+        function onYouTubeIframeAPIReady() {
+          player = new YT.Player("yt-player-embed", {
+            playerVars: {
+              playsinline: 1,
+            },
+            events: {
+              onStateChange: onPlayerStateChange,
+            },
+          });
+        }
       } else {
         container.innerHTML =
           "<p style='color:white; text-align:center; padding-top:20px;'>Invalid Video ID</p>";
+      }
+
+      // The API calls this function when the player's state changes.
+      // The function indicates that when playing a video (state=1),
+      // the player should play for six seconds and then stop.
+      function onPlayerStateChange(event) {
+        console.log("Player State: " + JSON.stringify(event));
+        window.postMessage(event, "*");
+        // if (event.data == YT.PlayerState.PLAYING && !done) {
+        //   setTimeout(stopVideo, 6000);
+        //   done = true;
+        // }
       }
     </script>
   </body>
