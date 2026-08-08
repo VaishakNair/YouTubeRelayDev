@@ -59,9 +59,15 @@
 
         container.appendChild(iframe);
 
-        // 2. Forward postMessages received from extension window down to inner YouTube embed iframe
+        // 2. Forward postMessages: 
+        // - From parent extension window down to inner YouTube embed iframe
+        // - From inner YouTube embed iframe up to parent extension window
         window.addEventListener("message", (event) => {
-          if (iframe.contentWindow) {
+          if (iframe.contentWindow && event.source === iframe.contentWindow) {
+            if (window.parent && window.parent !== window) {
+              window.parent.postMessage(event.data, "*");
+            }
+          } else if (iframe.contentWindow && event.source !== iframe.contentWindow) {
             iframe.contentWindow.postMessage(event.data, "*");
           }
         });
@@ -73,7 +79,7 @@
         firstScriptTag.parentNode.insertBefore(tag, firstScriptTag);
 
         let player;
-        function onYouTubeIframeAPIReady() {
+        window.onYouTubeIframeAPIReady = function() {
           player = new YT.Player("yt-player-embed", {
             playerVars: {
               playsinline: 1,
@@ -82,23 +88,19 @@
               onStateChange: onPlayerStateChange,
             },
           });
-        }
+        };
       } else {
         container.innerHTML =
           "<p style='color:white; text-align:center; padding-top:20px;'>Invalid Video ID</p>";
       }
 
       // The API calls this function when the player's state changes.
-      // The function indicates that when playing a video (state=1),
-      // the player should play for six seconds and then stop.
       function onPlayerStateChange(event) {
         console.log("Player State: " + JSON.stringify(event));
-        const message = { state: event.data };
-        window.postMessage(JSON.stringify(message), "*");
-        // if (event.data == YT.PlayerState.PLAYING && !done) {
-        //   setTimeout(stopVideo, 6000);
-        //   done = true;
-        // }
+        const message = { type: "yt-player-state-change", state: event.data };
+        if (window.parent && window.parent !== window) {
+          window.parent.postMessage(JSON.stringify(message), "*");
+        }
       }
     </script>
   </body>
