@@ -93,7 +93,8 @@
       // the player should play for six seconds and then stop.
       function onPlayerStateChange(event) {
         console.log("Player State: " + JSON.stringify(event));
-        window.postMessage(event, "*");
+        const message = { state: event.data };
+        window.postMessage(message, "*");
         // if (event.data == YT.PlayerState.PLAYING && !done) {
         //   setTimeout(stopVideo, 6000);
         //   done = true;
