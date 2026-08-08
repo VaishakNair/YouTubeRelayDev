@@ -96,7 +96,6 @@
 
       // The API calls this function when the player's state changes.
       function onPlayerStateChange(event) {
-        console.log("Player State: " + JSON.stringify(event));
         const message = { type: "yt-player-state-change", state: event.data };
         if (window.parent && window.parent !== window) {
           window.parent.postMessage(JSON.stringify(message), "*");
