@@ -81,6 +81,19 @@
             }
           }
         });
+
+        iframe.addEventListener("load", () => {
+          // Give YouTube's internal compiler engine a brief moment to map its 'this.api' object
+          setTimeout(() => {
+            iframe.contentWindow.postMessage(
+              JSON.stringify({
+                event: "listening",
+                id: 1,
+              }),
+              "https://www.youtube.com",
+            );
+          }, 350); // 350ms delay eliminates the race condition on almost all networks
+        });
       } else {
         container.innerHTML =
           "<p style='color:white; text-align:center; padding-top:20px;'>Invalid Video ID</p>";
