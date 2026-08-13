@@ -36,7 +36,7 @@
       const start = urlParams.get("start") || urlParams.get("t");
       const autoplay = urlParams.get("autoplay");
       const container = document.getElementById("player-container");
-      let isPlayerReady = false;
+      // let isPlayerReady = false;
 
       if (videoId && /^[a-zA-Z0-9_-]{11}$/.test(videoId)) {
         const iframe = document.createElement("iframe");
@@ -69,14 +69,14 @@
           );
           if (event.source === iframe.contentWindow) {
             // Message is from YouTube's iframe
-            if (isInitialDelivery(iframe, event)) return;
+            // if (isInitialDelivery(iframe, event)) return;
 
             if (window.parent && window.parent !== window) {
               window.parent.postMessage(event.data, "*");
             }
           } else {
             // Message is from the parent extension window
-            if (iframe.contentWindow && isPlayerReady) {
+            if (iframe.contentWindow) {
               iframe.contentWindow.postMessage(event.data, "*");
             }
           }
@@ -86,27 +86,27 @@
           "<p style='color:white; text-align:center; padding-top:20px;'>Invalid Video ID</p>";
       }
 
-      function isInitialDelivery(iframe, event) {
-        try {
-          const rawData = JSON.parse(event.data);
+      // function isInitialDelivery(iframe, event) {
+      //   try {
+      //     const rawData = JSON.parse(event.data);
 
-          if (rawData.event === "initialDelivery") {
-            // Tell YouTube's iframe context to start talking to us
-            iframe.contentWindow.postMessage(
-              JSON.stringify({
-                event: "listening",
-                id: 1,
-              }),
-              "https://www.youtube.com",
-            );
-            isPlayerReady = true;
-            return true;
-          }
-        } catch (e) {
-          console.error("Failed to parse event data:", e);
-        }
-        return false;
-      }
+      //     if (rawData.event === "initialDelivery") {
+      //       // Tell YouTube's iframe context to start talking to us
+      //       iframe.contentWindow.postMessage(
+      //         JSON.stringify({
+      //           event: "listening",
+      //           id: 1,
+      //         }),
+      //         "https://www.youtube.com",
+      //       );
+      //       isPlayerReady = true;
+      //       return true;
+      //     }
+      //   } catch (e) {
+      //     console.error("Failed to parse event data:", e);
+      //   }
+      //   return false;
+      // }
     </script>
   </body>
 </html>
