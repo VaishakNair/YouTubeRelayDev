@@ -74,28 +74,19 @@
         // - From parent extension window down to inner YouTube embed iframe
         // - From inner YouTube embed iframe up to parent extension window
         window.addEventListener("message", (event) => {
-          if (iframe.contentWindow && event.source === iframe.contentWindow) {
+          if (event.source === iframe.contentWindow) {
             if (window.parent && window.parent !== window) {
               window.parent.postMessage(event.data, "*");
             }
-          } else if (
-            iframe.contentWindow &&
-            event.source !== iframe.contentWindow
-          ) {
-            iframe.contentWindow.postMessage(event.data, "*");
+          } else if (event.source !== iframe.contentWindow) {
+            if (iframe.contentWindow) {
+              iframe.contentWindow.postMessage(event.data, "*");
+            }
           }
         });
       } else {
         container.innerHTML =
           "<p style='color:white; text-align:center; padding-top:20px;'>Invalid Video ID</p>";
-      }
-
-      // The API calls this function when the player's state changes.
-      function onPlayerStateChange(event) {
-        const message = { type: "yt-player-state-change", state: event.data };
-        if (window.parent && window.parent !== window) {
-          window.parent.postMessage(JSON.stringify(message), "*");
-        }
       }
     </script>
   </body>
