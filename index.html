@@ -64,13 +64,18 @@
         // - From parent extension window down to inner YouTube embed iframe
         // - From inner YouTube embed iframe up to parent extension window
         window.addEventListener("message", (event) => {
+          console.log(
+            `Message event inside the yt-player iframe: ${JSON.stringify(event.data)}`,
+          );
           if (event.source === iframe.contentWindow) {
+            // Message is from YouTube's iframe
             if (isInitialDelivery(iframe, event)) return;
 
             if (window.parent && window.parent !== window) {
               window.parent.postMessage(event.data, "*");
             }
-          } else if (event.source !== iframe.contentWindow) {
+          } else {
+            // Message is from the parent extension window
             if (iframe.contentWindow && isPlayerReady) {
               iframe.contentWindow.postMessage(event.data, "*");
             }
