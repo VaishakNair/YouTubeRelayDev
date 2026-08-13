@@ -36,6 +36,7 @@
       const start = urlParams.get("start") || urlParams.get("t");
       const autoplay = urlParams.get("autoplay");
       const container = document.getElementById("player-container");
+      let isPlayerReady = false;
 
       if (videoId && /^[a-zA-Z0-9_-]{11}$/.test(videoId)) {
         const iframe = document.createElement("iframe");
@@ -70,7 +71,7 @@
               window.parent.postMessage(event.data, "*");
             }
           } else if (event.source !== iframe.contentWindow) {
-            if (iframe.contentWindow) {
+            if (iframe.contentWindow && isPlayerReady) {
               iframe.contentWindow.postMessage(event.data, "*");
             }
           }
@@ -93,6 +94,7 @@
               }),
               "https://www.youtube.com",
             );
+            isPlayerReady = true;
             return true;
           }
         } catch (e) {
