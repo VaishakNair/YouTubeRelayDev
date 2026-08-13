@@ -57,9 +57,20 @@
           "accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture";
         iframe.allowFullscreen = true;
 
+        // 1. Tell YouTube's iframe context to start talking to us
+        iframe.addEventListener("load", () => {
+          iframe.contentWindow.postMessage(
+            JSON.stringify({
+              event: "listening",
+              id: 1,
+            }),
+            "https://www.youtube.com",
+          );
+        });
+
         container.appendChild(iframe);
 
-        // 2. Forward postMessages: 
+        // 2. Forward postMessages:
         // - From parent extension window down to inner YouTube embed iframe
         // - From inner YouTube embed iframe up to parent extension window
         window.addEventListener("message", (event) => {
@@ -67,28 +78,13 @@
             if (window.parent && window.parent !== window) {
               window.parent.postMessage(event.data, "*");
             }
-          } else if (iframe.contentWindow && event.source !== iframe.contentWindow) {
+          } else if (
+            iframe.contentWindow &&
+            event.source !== iframe.contentWindow
+          ) {
             iframe.contentWindow.postMessage(event.data, "*");
           }
         });
-
-        // This code loads the IFrame Player API code asynchronously.
-        var tag = document.createElement("script");
-        tag.src = "https://www.youtube.com/iframe_api";
-        var firstScriptTag = document.getElementsByTagName("script")[0];
-        firstScriptTag.parentNode.insertBefore(tag, firstScriptTag);
-
-        let player;
-        window.onYouTubeIframeAPIReady = function() {
-          player = new YT.Player("yt-player-embed", {
-            playerVars: {
-              playsinline: 1,
-            },
-            events: {
-              onStateChange: onPlayerStateChange,
-            },
-          });
-        };
       } else {
         container.innerHTML =
           "<p style='color:white; text-align:center; padding-top:20px;'>Invalid Video ID</p>";
