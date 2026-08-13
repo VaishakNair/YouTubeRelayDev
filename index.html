@@ -36,7 +36,6 @@
       const start = urlParams.get("start") || urlParams.get("t");
       const autoplay = urlParams.get("autoplay");
       const container = document.getElementById("player-container");
-      // let isPlayerReady = false;
 
       if (videoId && /^[a-zA-Z0-9_-]{11}$/.test(videoId)) {
         const iframe = document.createElement("iframe");
@@ -64,13 +63,8 @@
         // - From parent extension window down to inner YouTube embed iframe
         // - From inner YouTube embed iframe up to parent extension window
         window.addEventListener("message", (event) => {
-          console.log(
-            `Message event inside the yt-player iframe: ${JSON.stringify(event.data)}`,
-          );
           if (event.source === iframe.contentWindow) {
             // Message is from YouTube's iframe
-            // if (isInitialDelivery(iframe, event)) return;
-
             if (window.parent && window.parent !== window) {
               window.parent.postMessage(event.data, "*");
             }
@@ -85,6 +79,7 @@
         iframe.addEventListener("load", () => {
           // Give YouTube's internal compiler engine a brief moment to map its 'this.api' object
           setTimeout(() => {
+            // Tell YouTube's iframe context to start talking to us
             iframe.contentWindow.postMessage(
               JSON.stringify({
                 event: "listening",
@@ -98,28 +93,6 @@
         container.innerHTML =
           "<p style='color:white; text-align:center; padding-top:20px;'>Invalid Video ID</p>";
       }
-
-      // function isInitialDelivery(iframe, event) {
-      //   try {
-      //     const rawData = JSON.parse(event.data);
-
-      //     if (rawData.event === "initialDelivery") {
-      //       // Tell YouTube's iframe context to start talking to us
-      //       iframe.contentWindow.postMessage(
-      //         JSON.stringify({
-      //           event: "listening",
-      //           id: 1,
-      //         }),
-      //         "https://www.youtube.com",
-      //       );
-      //       isPlayerReady = true;
-      //       return true;
-      //     }
-      //   } catch (e) {
-      //     console.error("Failed to parse event data:", e);
-      //   }
-      //   return false;
-      // }
     </script>
   </body>
 </html>
